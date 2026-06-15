@@ -1,55 +1,155 @@
 .branch-card {
   background: var(--bg-panel-raised);
   border: 2px solid var(--gold-dim);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr;
+  grid-template-areas:
+    "sigil head head"
+    "sigil meaning meaning"
+    "sigil domains domains"
+    "progress progress unlock"
+    "anti anti anti";
+  gap: 8px 12px;
   box-shadow: inset 0 0 0 2px var(--bg-panel);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .branch-card__sigil {
-  font-size: 36px;
+  grid-area: sigil;
+  font-size: 40px;
+  line-height: 1;
+  align-self: start;
+}
+
+.branch-card__head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.branch-card__tier {
+  padding: 3px 8px;
+  border: 2px solid var(--gold-dim);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.branch-card__tier--bronze {
+  border-color: #b8922e;
+  color: #d4a574;
+}
+
+.branch-card__tier--silver {
+  border-color: #94a3b8;
+  color: #cbd5e1;
+}
+
+.branch-card__tier--gold {
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 8px rgba(248, 193, 74, 0.25);
 }
 
 .branch-card__name {
-  font-size: 22px;
+  font-size: 18px;
   color: var(--gold);
+  margin: 0;
 }
 
 .branch-card__meaning {
+  grid-area: meaning;
   color: var(--muted);
-  font-size: 18px;
-  line-height: 1.3;
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0;
 }
 
 .branch-card__domains {
+  grid-area: domains;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-
-.branch-card__progress {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
 }
 
+.branch-card__domains .domain-badge {
+  font-size: 14px;
+  padding: 2px 8px;
+}
+
+.branch-card__progress {
+  grid-area: progress;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.branch-card__progress .pixel-progress {
+  height: 10px;
+}
+
 .branch-card__unlock {
-  padding: 10px;
+  grid-area: unlock;
+  padding: 8px;
   background: var(--bg-panel);
   border-left: 3px solid var(--skill-fill);
+  font-size: 15px;
+  line-height: 1.25;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .branch-card__unlock-label {
   display: block;
   color: var(--skill-fill);
-  font-size: 16px;
-  margin-bottom: 4px;
+  font-size: 14px;
+  margin-bottom: 3px;
 }
 
 .branch-card__anti-ai {
-  font-size: 16px;
+  grid-area: anti;
+  font-size: 14px;
   color: var(--muted);
   font-style: italic;
+  margin: 0;
+}
+
+@media (min-width: 900px) {
+  .branch-card {
+    grid-template-columns: 72px 1fr 1fr;
+    grid-template-areas:
+      "sigil head unlock"
+      "sigil meaning unlock"
+      "sigil domains unlock"
+      "progress progress unlock"
+      "anti anti anti";
+    align-content: start;
+  }
+
+  .branch-card__unlock {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .branch-card {
+    grid-template-columns: 48px 1fr;
+    grid-template-areas:
+      "sigil head"
+      "meaning meaning"
+      "domains domains"
+      "progress progress"
+      "unlock unlock"
+      "anti anti";
+  }
+
+  .branch-card__sigil {
+    font-size: 32px;
+  }
 }

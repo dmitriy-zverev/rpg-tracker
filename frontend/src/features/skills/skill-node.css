@@ -1,0 +1,218 @@
+.skill-tree-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 108px;
+  margin: 0 auto;
+}
+
+.skill-node {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out);
+}
+
+.skill-node__frame {
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--gold-dim);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(184, 148, 58, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--bg-panel-raised), var(--bg-panel));
+  box-shadow:
+    inset 0 0 0 1px var(--bg-void),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.45);
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+}
+
+.skill-node__frame::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(184, 148, 58, 0.15);
+  clip-path: inherit;
+  pointer-events: none;
+}
+
+.skill-node__frame::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  height: var(--node-fill, 0%);
+  max-height: calc(100% - 6px);
+  background: linear-gradient(180deg, rgba(138, 122, 90, 0.4), rgba(92, 74, 40, 0.08));
+  clip-path: inherit;
+  pointer-events: none;
+  transition: height var(--dur-med) var(--ease-out);
+}
+
+.skill-node__icon {
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-icon);
+  line-height: 1;
+  color: var(--gold-ink);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.skill-node__rank {
+  position: relative;
+  z-index: 1;
+  font-size: 8px;
+  line-height: 1;
+  padding: 1px 4px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.skill-tier--bronze {
+  border-color: #8a7a5a;
+  color: #b8946a;
+}
+
+.skill-tier--silver {
+  border-color: #7a7268;
+  color: #b8b0a4;
+}
+
+.skill-tier--gold {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+.skill-tier--dim {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.skill-node__label {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 0 1px;
+  font-size: var(--text-micro);
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  pointer-events: none;
+}
+
+.skill-tree-slot:has(.skill-node--selected) .skill-node__label {
+  color: var(--gold);
+}
+
+.skill-tree-slot:has(.skill-node--invested) .skill-node__label {
+  color: var(--text);
+  opacity: 0.92;
+}
+
+.skill-node--dim .skill-node__frame {
+  opacity: 0.72;
+  filter: grayscale(0.35);
+}
+
+.skill-node--invested .skill-node__frame {
+  border-color: var(--gold-dim);
+  box-shadow:
+    inset 0 0 0 1px var(--bg-void),
+    0 0 6px var(--skill-glow);
+}
+
+.skill-node--invested .skill-node__icon {
+  color: var(--gold);
+}
+
+.skill-node--active .skill-node__frame {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--bg-void),
+    0 0 8px rgba(92, 74, 40, 0.35);
+  animation: skill-node-pulse 2s ease-in-out infinite;
+}
+
+.skill-node--mastered .skill-node__frame {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--bg-void),
+    0 0 10px var(--skill-glow);
+}
+
+.skill-node--selected {
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.skill-node--selected .skill-node__frame {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--bg-void),
+    0 0 0 1px rgba(184, 148, 58, 0.25),
+    0 0 12px var(--skill-glow);
+}
+
+.skill-node:hover:not(.skill-node--selected) {
+  transform: scale(1.04);
+}
+
+.skill-node:hover .skill-node__frame {
+  border-color: var(--gold-dim);
+}
+
+@keyframes skill-node-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-node--active .skill-node__frame {
+    animation: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .skill-tree-slot {
+    max-width: 88px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .skill-tree-slot {
+    max-width: 118px;
+  }
+}

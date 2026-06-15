@@ -1,0 +1,41 @@
+.quest-type-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--gold-ink);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.quest-type-icon--main,
+.quest-type-icon--crafting {
+  color: var(--muted);
+}
+
+.quest-type-icon--debug,
+.quest-type-icon--test {
+  color: var(--gold-ink);
+}
+
+.quest-type-icon--boss {
+  color: #b89090;
+  font-size: 15px;
+}
+
+.quest-node--in_progress .quest-type-icon,
+.quest-node--review .quest-type-icon,
+.quest-node--selected .quest-type-icon {
+  color: var(--gold);
+}
+
+.quest-node--done .quest-type-icon {
+  color: var(--map-node);
+  opacity: 0.85;
+}
+
+.quest-node--boss .quest-type-icon {
+  color: #b89090;
+}

@@ -1,16 +1,31 @@
-.skill-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.skill-tree__intro {
-  color: var(--muted);
-  font-size: 18px;
-}
-
-.skill-grid {
+.skill-screen {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: var(--content-gap);
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.skill-screen > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 767px) {
+  .skill-screen {
+    grid-template-rows: minmax(200px, 1fr) minmax(220px, 0.95fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .skill-screen {
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-rows: 1fr;
+  }
+}
+
+@media (min-width: 1280px) {
+  .skill-screen {
+    grid-template-columns: 1.12fr 0.88fr;
+  }
 }

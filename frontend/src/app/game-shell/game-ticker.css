@@ -1,0 +1,75 @@
+.game-ticker {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(11, 9, 19, 0.72);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.game-ticker__beacon {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  animation: beacon-blink 1.6s ease-in-out infinite;
+}
+
+.game-ticker--active .game-ticker__beacon {
+  background: var(--quest-active);
+  box-shadow: 0 0 10px var(--quest-active);
+}
+
+.game-ticker--unlock .game-ticker__beacon {
+  background: var(--quest-done);
+  box-shadow: 0 0 10px var(--quest-done);
+}
+
+.game-ticker--milestone .game-ticker__beacon {
+  background: var(--xp-fill);
+  box-shadow: 0 0 12px var(--xp-glow);
+}
+
+.game-ticker--explore .game-ticker__beacon {
+  background: var(--skill-fill);
+  box-shadow: 0 0 8px var(--skill-glow);
+}
+
+.game-ticker__label {
+  font-size: 7px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.game-ticker__line {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: ticker-in 0.45s ease-out;
+}
+
+.game-ticker--active {
+  border-color: rgba(184, 148, 58, 0.4);
+  background: linear-gradient(90deg, rgba(184, 148, 58, 0.06), transparent 40%), rgba(11, 9, 19, 0.8);
+}
+
+.game-ticker--unlock {
+  border-color: rgba(122, 106, 80, 0.45);
+  background: linear-gradient(90deg, rgba(122, 106, 80, 0.08), transparent 45%), rgba(11, 9, 19, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-ticker__beacon {
+    animation: none;
+  }
+
+  .game-ticker__line {
+    animation: none;
+  }
+}

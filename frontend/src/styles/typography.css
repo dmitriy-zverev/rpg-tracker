@@ -1,10 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap");
 
 body {
   font-family: var(--font-body);
-  font-size: 22px;
+  font-size: var(--text-body);
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -12,13 +13,25 @@ h2,
 h3,
 .display {
   font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.05em;
+  font-size: var(--text-display);
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--gold-bright);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.95),
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(201, 162, 39, 0.2);
+}
+
+.prose {
+  font-family: var(--font-prose);
+  font-size: var(--text-prose);
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }
 
 .stats {
   font-family: var(--font-stats);
-  font-size: 16px;
+  font-size: var(--text-stats);
 }

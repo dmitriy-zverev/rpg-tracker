@@ -1,9 +1,6 @@
-export function DomainBadge({ name, color, icon }: { name: string; color: string; icon: string }) {
+export function DomainBadge({ name, icon }: { name: string; color?: string; icon: string }) {
   return (
-    <span
-      className="domain-badge"
-      style={{ borderLeftColor: color, background: `${color}22` }}
-    >
+    <span className="domain-badge">
       <span>{icon}</span> {name}
     </span>
   );

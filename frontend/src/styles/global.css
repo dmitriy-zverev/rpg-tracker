@@ -1,4 +1,7 @@
 @import "./tokens.css";
+@import "./theme-light.css";
+@import "./layout.css";
+@import "./responsive.css";
 @import "./typography.css";
 @import "./atmosphere.css";
 @import "./crt.css";
@@ -26,4 +29,9 @@ textarea {
 :focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
 }

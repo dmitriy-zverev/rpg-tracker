@@ -1,11 +1,17 @@
 from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from rpg_tracker.domain.enums import Priority, QuestStatus, QuestType
 
 
+class HealthResponse(BaseModel):
+    status: str
+
+
 class DomainResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     slug: str
     name: str
     color: str
@@ -17,6 +23,8 @@ class DomainListResponse(BaseModel):
 
 
 class QuestResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     stage_index: int
     stage_name: str
@@ -33,6 +41,8 @@ class QuestResponse(BaseModel):
     evidence: str
     start_date: date | None
     deadline: date | None
+    campaign_slug: str
+    act_number: int
 
 
 class QuestListResponse(BaseModel):
@@ -70,6 +80,56 @@ class StageSummaryResponse(BaseModel):
     progress: float
 
 
+class ActSummaryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    number: int
+    slug: str
+    name: str
+    tagline: str
+    stage_from: int
+    stage_to: int
+    available_xp: int
+    earned_xp: int
+    progress: float
+    quest_total: int
+    quest_done: int
+    boss_total: int
+    boss_done: int
+    stages_total: int
+    stages_cleared: int
+    status: str
+
+
+class CampaignSummaryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    slug: str
+    name: str
+    tagline: str
+    discipline: str
+    progress: float
+    earned_xp: int
+    available_xp: int
+    act_count: int
+    acts_cleared: int
+
+
+class CampaignListResponse(BaseModel):
+    campaigns: list[CampaignSummaryResponse]
+
+
+class CampaignDetailResponse(BaseModel):
+    slug: str
+    name: str
+    tagline: str
+    discipline: str
+    progress: float
+    earned_xp: int
+    available_xp: int
+    acts: list[ActSummaryResponse]
+
+
 class DashboardResponse(BaseModel):
     player: PlayerResponse
     level: int
@@ -79,6 +139,11 @@ class DashboardResponse(BaseModel):
     quest_counts: dict[str, int]
     domains: list[DomainSummaryResponse]
     stages: list[StageSummaryResponse]
+    campaign: CampaignDetailResponse
+    campaigns: list[CampaignSummaryResponse]
+    current_quest: QuestResponse | None = None
+    suggested_quest: QuestResponse | None = None
+    up_next_quests: list[QuestResponse] = Field(default_factory=list)
 
 
 class RoadmapStageResponse(BaseModel):
@@ -117,3 +182,8 @@ class SkillBranchResponse(BaseModel):
 
 class SkillBranchesResponse(BaseModel):
     branches: list[SkillBranchResponse]
+
+
+class PomodoroConfigResponse(BaseModel):
+    focus_seconds: int
+    break_seconds: int

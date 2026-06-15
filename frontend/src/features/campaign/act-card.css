@@ -1,0 +1,182 @@
+.act-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  gap: 6px;
+  padding: 10px;
+  background: linear-gradient(165deg, var(--bg-panel-raised), var(--bg-panel));
+  border: 2px solid var(--gold-dim);
+  box-shadow: inset 0 1px 0 rgba(201, 162, 39, 0.08);
+}
+
+.act-card--locked {
+  opacity: 0.55;
+  border-style: dashed;
+  filter: grayscale(0.4);
+}
+
+.act-card--active {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 197, 71, 0.12),
+    0 0 12px rgba(201, 162, 39, 0.15);
+}
+
+.act-card--cleared {
+  border-color: var(--quest-done);
+}
+
+.act-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.act-card__number {
+  color: var(--gold-bright);
+  font-size: 11px;
+}
+
+.act-card__status {
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid var(--gold-dim);
+}
+
+.act-card__status--active {
+  color: var(--gold-bright);
+  border-color: var(--gold);
+}
+
+.act-card__status--cleared {
+  color: var(--quest-done);
+  border-color: var(--quest-done);
+}
+
+.act-card__status--locked {
+  color: var(--muted);
+}
+
+.act-card__name {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.act-card__tagline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.2;
+  flex: 1 1 auto;
+  min-height: 2.4em;
+}
+
+.act-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: auto;
+}
+
+.act-card__boss {
+  color: var(--blood);
+}
+
+.act-card__xp {
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.act-card__link {
+  align-self: flex-start;
+  color: var(--gold-bright);
+  font-size: 12px;
+}
+
+.act-card__link:hover {
+  text-decoration: underline;
+}
+
+.campaign-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, rgba(139, 26, 26, 0.2), transparent 70%);
+  border-left: 3px solid var(--blood);
+}
+
+.campaign-hero__name {
+  margin: 0;
+  font-size: 11px;
+}
+
+.campaign-hero__tagline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.campaign-hero__progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campaign-hero__progress .pixel-progress {
+  flex: 1;
+}
+
+.campaign-hero__xp {
+  color: var(--gold);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dash-slide--campaign {
+  display: flex;
+  flex-direction: column;
+  gap: var(--content-gap);
+  flex: 1 1 0;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-dim) var(--bg-void);
+}
+
+.dash-act-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  align-items: stretch;
+  gap: var(--content-gap);
+}
+
+.dash-campaign-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(139, 26, 26, 0.08);
+  flex-shrink: 0;
+}
+
+.dash-campaign-strip__name {
+  margin: 0;
+  font-size: 9px;
+  flex: 1;
+}
+
+.dash-campaign-strip__xp {
+  color: var(--gold);
+  font-size: 11px;
+  white-space: nowrap;
+}

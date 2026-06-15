@@ -3,8 +3,20 @@ from datetime import date
 
 from sqlmodel import Session
 
+from rpg_tracker.domain.campaign import get_campaign, quest_placement, recommended_campaign_slug, stage_indices_for_campaign
+from rpg_tracker.domain.exceptions import CampaignNotFoundError
 from rpg_tracker.domain.enums import Priority, QuestStatus, QuestType
-from rpg_tracker.domain.exceptions import QuestNotFoundError
+from rpg_tracker.domain.exceptions import (
+    ActiveQuestConflictError,
+    QuestLockedError,
+    QuestNotFoundError,
+)
+from rpg_tracker.domain.quest_flow import (
+    chain_for_stage,
+    find_active_quest,
+    prerequisites_met,
+    quest_focus,
+)
 from rpg_tracker.domain.xp_engine import (
     calculate_earned_xp,
     calculate_level,
@@ -13,7 +25,7 @@ from rpg_tracker.domain.xp_engine import (
     calculate_xp,
     xp_to_next_level,
 )
-from rpg_tracker.infrastructure.models import Domain, PlayerProfile, RoadmapStage, SkillBranch
+from rpg_tracker.infrastructure.models import Domain, PlayerProfile, RoadmapStage
 from rpg_tracker.infrastructure.repositories import (
     BranchRepository,
     DomainRepository,
@@ -62,10 +74,13 @@ class QuestDTO:
     evidence: str
     start_date: date | None
     deadline: date | None
+    campaign_slug: str
+    act_number: int
 
 
 def quest_to_dto(record: QuestRecord) -> QuestDTO:
     metrics = quest_metrics(record)
+    campaign_slug, act_number = quest_placement(record.stage_index)
     return QuestDTO(
         id=record.id,
         stage_index=record.stage_index,
@@ -83,6 +98,8 @@ def quest_to_dto(record: QuestRecord) -> QuestDTO:
         evidence=record.evidence,
         start_date=record.start_date,
         deadline=record.deadline,
+        campaign_slug=campaign_slug,
+        act_number=act_number,
     )
 
 
@@ -115,6 +132,20 @@ class TrackerService:
         start_date: date | None = None,
         deadline: date | None = None,
     ) -> QuestDTO:
+        if status == QuestStatus.IN_PROGRESS:
+            quests = self._all_quest_dtos()
+            active = find_active_quest(quests)
+            if active is not None and active.id != quest_id:
+                raise ActiveQuestConflictError(active.id)
+
+            target = next((quest for quest in quests if quest.id == quest_id), None)
+            if target is None:
+                raise QuestNotFoundError(quest_id)
+
+            chain = chain_for_stage(quests, target.stage_index)
+            if not prerequisites_met(target, chain):
+                raise QuestLockedError(quest_id)
+
         updated = self._quests.update(
             quest_id,
             status=status,
@@ -130,8 +161,14 @@ class TrackerService:
     def list_domains(self) -> list[Domain]:
         return self._domains.list_all()
 
-    def list_stages_with_progress(self) -> list[dict]:
+    def list_stages_with_progress(self, campaign_slug: str | None = None) -> list[dict]:
         stages = self._stages.list_all()
+        if campaign_slug is not None:
+            campaign = get_campaign(campaign_slug)
+            if campaign is None:
+                raise CampaignNotFoundError(campaign_slug)
+            allowed = stage_indices_for_campaign(campaign)
+            stages = [stage for stage in stages if stage.index in allowed]
         quests = self._all_quest_dtos()
         result = []
         for stage in stages:
@@ -188,8 +225,9 @@ class TrackerService:
                 "progress": calculate_progress(earned, available),
             })
 
+        recommended_slug = recommended_campaign_slug(quests)
         stage_summaries = []
-        for item in self.list_stages_with_progress():
+        for item in self.list_stages_with_progress(campaign_slug=recommended_slug):
             stage: RoadmapStage = item["stage"]
             stage_summaries.append({
                 "index": stage.index,
@@ -198,6 +236,8 @@ class TrackerService:
                 "priority": stage.priority,
                 "progress": item["progress"],
             })
+
+        focus = quest_focus(quests)
 
         return {
             "player": player,
@@ -208,4 +248,7 @@ class TrackerService:
             "quest_counts": status_counts,
             "domains": domain_rows,
             "stages": stage_summaries,
+            "current_quest": focus["current_quest"],
+            "suggested_quest": focus["suggested_quest"],
+            "up_next_quests": focus["up_next_quests"],
         }

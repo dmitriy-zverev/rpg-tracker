@@ -1,0 +1,21 @@
+.scroll-y {
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-dim) var(--bg-void);
+}
+
+.scroll-y::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-y::-webkit-scrollbar-thumb {
+  background: var(--gold-dim);
+  border-radius: 0;
+}
+
+.screen-loading {
+  color: var(--muted);
+  font-size: var(--text-body);
+}

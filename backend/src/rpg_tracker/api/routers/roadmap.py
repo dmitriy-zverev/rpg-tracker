@@ -1,14 +1,24 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
 
 from rpg_tracker.api.deps import TrackerServiceDep
 from rpg_tracker.api.schemas import RoadmapStageResponse, RoadmapStagesResponse
+from rpg_tracker.domain.campaign import SYSTEMS_ENGINEER_CAMPAIGN
 
 roadmap_router = APIRouter(prefix="/api/v1/roadmap", tags=["roadmap"])
 
 
 @roadmap_router.get("/stages", response_model=RoadmapStagesResponse)
-def list_stages(service: TrackerServiceDep) -> RoadmapStagesResponse:
-    items = service.list_stages_with_progress()
+def list_stages(
+    service: TrackerServiceDep,
+    campaign_slug: Annotated[
+        str | None,
+        Query(description="Campaign slug; defaults to the main systems engineer path"),
+    ] = None,
+) -> RoadmapStagesResponse:
+    slug = campaign_slug or SYSTEMS_ENGINEER_CAMPAIGN.slug
+    items = service.list_stages_with_progress(campaign_slug=slug)
     stages = []
     for item in items:
         stage = item["stage"]

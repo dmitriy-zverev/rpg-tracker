@@ -1,18 +1,125 @@
 :root {
-  --bg-void: #0b0913;
-  --bg-deep: #14111f;
-  --bg-panel: #211a35;
-  --bg-panel-raised: #2d2545;
-  --gold: #f8c14a;
-  --gold-dim: #b8922e;
-  --text: #f8fafc;
-  --muted: #c7bfe6;
-  --xp-fill: #34d399;
-  --xp-glow: rgba(52, 211, 153, 0.35);
-  --skill-fill: #a78bfa;
-  --danger: #f87171;
-  --party-width: 220px;
-  --font-display: "Press Start 2P", monospace;
+  --bg-void: #0b0907;
+  --bg-deep: #13100d;
+  --bg-panel: #1b1713;
+  --bg-panel-raised: #252019;
+  --bg-panel-hover: #2e2720;
+  --bg-input: #1e1a15;
+  --gold: #c9a227;
+  --gold-bright: #e4cc7a;
+  --gold-dim: #7a6438;
+  --gold-ink: #d8bc72;
+  --cta-bg: linear-gradient(180deg, #3a3228 0%, #252018 55%, #1a1612 100%);
+  --cta-bg-hover: linear-gradient(180deg, #423830 0%, #2c261e 55%, #201c16 100%);
+  --cta-border: var(--gold-dim);
+  --cta-text: var(--text);
+  --blood: #7a1515;
+  --blood-bright: #b82a2a;
+  --blood-glow: rgba(184, 42, 42, 0.4);
+  --ember: #d4642a;
+  --stone: #2a2420;
+  --text: #f5efe6;
+  --muted: #c8bdb0;
+  --subtle: #a89b8c;
+  --placeholder: #b5a899;
+  --xp-fill: #6b5c48;
+  --xp-glow: rgba(107, 92, 72, 0.35);
+  --skill-fill: #7a6e58;
+  --skill-glow: rgba(122, 110, 88, 0.35);
+  --arcane: #6a6258;
+  --danger: #c53030;
+  --header-height: 56px;
+  --map-node: #b0a080;
+  --map-node-dim: #3a3228;
+  --map-path: #7a6438;
+  --quest-done: #7a6a50;
+  --quest-active: #c9a86a;
+  --quest-blocked: #c53030;
+  /* Diablo UI tokens */
+  --diablo-clip-sm: polygon(
+    4px 0,
+    calc(100% - 4px) 0,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    0 calc(100% - 4px),
+    0 4px
+  );
+  --diablo-clip-md: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    0 calc(100% - 6px),
+    0 6px
+  );
+  --diablo-clip-lg: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+  --diablo-surface-bg:
+    linear-gradient(180deg, rgba(240, 208, 96, 0.06) 0%, transparent 28%),
+    linear-gradient(165deg, var(--bg-panel-raised) 0%, var(--bg-panel) 55%, #120e0c 100%);
+  --diablo-surface-deep:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 40%),
+    var(--bg-void);
+  --diablo-inner-line: rgba(154, 122, 48, 0.42);
+  --diablo-shadow:
+    inset 0 1px 0 rgba(240, 208, 96, 0.1),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.35),
+    0 4px 16px rgba(0, 0, 0, 0.45);
+  --font-display: "Cinzel", "Press Start 2P", serif;
+  --font-prose: "Crimson Pro", Georgia, serif;
   --font-body: "VT323", monospace;
   --font-stats: "Silkscreen", monospace;
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(240, 208, 96, 0.06);
+  --shadow-glow-gold: 0 0 20px rgba(201, 162, 39, 0.2);
+  --shadow-glow-blood: 0 0 24px rgba(139, 26, 26, 0.35);
+  --border-ornate: 1px solid var(--gold-dim);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur-med: 280ms;
+  --pixel-btn-bg: linear-gradient(180deg, #2a231c, #1a1510);
+  --pixel-btn-bg-hover: linear-gradient(180deg, #352c22, #211b16);
+  --pixel-btn-shadow: #3d2e10;
+  --pixel-btn-text: var(--gold-bright);
+
+  /* Shell nav tray */
+  --nav-tray-bg: rgba(0, 0, 0, 0.45);
+  --nav-tray-border: rgba(92, 74, 40, 0.55);
+  --nav-tray-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  --nav-tab-text: #ddd4c8;
+  --nav-tab-text-hover: var(--text);
+  --nav-tab-icon: #e0c878;
+  --nav-tab-active-text: var(--gold);
+  --nav-tab-active-icon: var(--gold);
+  --nav-tab-active-bg: linear-gradient(180deg, rgba(184, 148, 58, 0.08), rgba(0, 0, 0, 0.3));
+  --nav-tab-hover-bg: rgba(184, 148, 58, 0.05);
+
+  /* Type scale — fixed at every breakpoint */
+  --text-micro: 9px;
+  --text-btn: 9px;
+  --text-display: 10px;
+  --text-label: 10px;
+  --text-caption: 11px;
+  --text-ui: 12px;
+  --text-stats: 13px;
+  --text-body: 18px;
+  --text-prose: 17px;
+  --text-title: 16px;
+  --text-heading: 17px;
+  --text-icon-sm: 15px;
+  --text-icon: 18px;
+  --text-hero: 26px;
+  --text-avatar: 30px;
+  --text-sigil: 22px;
 }

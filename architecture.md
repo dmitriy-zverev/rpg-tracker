@@ -50,10 +50,14 @@ flowchart TB
 backend/src/rpg_tracker/
 ├── domain/                 # Innermost — no outward deps
 │   ├── enums.py            # QuestStatus, QuestType, Priority
-│   ├── exceptions.py       # QuestNotFoundError
+│   ├── campaign.py         # Campaign → Act catalog, act progress, placement
+│   ├── quest_flow.py       # Chain order, single active quest, focus
+│   ├── pomodoro.py         # Pomodoro state machine
+│   ├── exceptions.py       # QuestNotFoundError, CampaignNotFoundError, …
 │   └── xp_engine.py        # XP, level, rank, progress (pure functions)
 ├── application/            # Use cases
-│   └── tracker_service.py  # TrackerService, QuestDTO, quest_to_dto
+│   ├── tracker_service.py  # TrackerService, QuestDTO, quest_to_dto
+│   └── campaign_service.py # CampaignService — act summaries from quests/stages
 ├── infrastructure/         # SQLite + SQLModel
 │   ├── models.py           # ORM table models
 │   ├── repositories.py     # QuestRepository, StageRepository, …
@@ -116,8 +120,9 @@ sequenceDiagram
 #### API (`api/`)
 
 - **Owns:** routes, query/body validation (`api/schemas`), dependency injection (`api/deps.py`), HTTP errors.
-- **Maps:** service DTOs → response schemas; never calls repositories directly.
-- **Thin handlers:** sync `def`, `Annotated` deps, explicit return types.
+- **Maps:** service DTOs → response schemas via `api/mappers.py`; never calls repositories directly.
+- **Errors:** domain exceptions → HTTP status in `api/exception_handlers.py` (registered in `main.py`).
+- **Thin handlers:** sync `def`, `Annotated` deps, explicit return types / `response_model`.
 
 ### Dependency injection
 
@@ -140,11 +145,13 @@ frontend/src/
 │   └── game-shell/         # Party strip, nav, layout
 ├── features/               # Vertical slices (one folder per screen)
 │   ├── dashboard/          # provider + screen + CSS
+│   ├── campaign/           # ActCard — campaign/act presentation
 │   ├── roadmap/
 │   ├── quests/
 │   └── skills/
 ├── shared/
 │   ├── api/                # types.ts, client.ts — backend boundary
+│   ├── campaign/           # RPG labels (Lesson, Boss Fight, …)
 │   └── ui/                 # PixelPanel, HudStat, progress bars, …
 └── styles/                 # Design tokens, global theme
 ```
@@ -155,10 +162,17 @@ Each feature follows the same shape:
 
 | Piece | File | Responsibility |
 |-------|------|----------------|
-| **Provider** | `*-provider.tsx` | TanStack Query, filters, mutations, context API |
+| **Provider** | `*-provider.tsx` | TanStack Query, filters, mutations; exports `state` / `actions` / `meta` |
 | **Screen** | `*.tsx` | Compose compound components; no direct `fetch` |
-| **Compound UI** | `stage-card.tsx`, `branch-card.tsx`, … | `Feature.Frame`, `.Header`, `.Body` children |
+| **Compound UI** | `stage-card.tsx`, `campaign-card.tsx`, `quest-detail.tsx`, … | Explicit variants via composition, not boolean props |
 | **Styles** | `*.css` | Feature-scoped layout |
+
+App shell owns the shared player session:
+
+| Piece | File | Responsibility |
+|-------|------|----------------|
+| **PlayerSessionProvider** | `app/game-shell/player-session-provider.tsx` | Single `["dashboard"]` query for HUD + modal |
+| **Feature providers** | e.g. `dashboard-provider.tsx` | Mutations + read from player session |
 
 ```mermaid
 flowchart LR
@@ -194,12 +208,55 @@ flowchart LR
 
 | Route | Feature |
 |-------|---------|
-| `/` | Dashboard |
-| `/roadmap` | Roadmap |
+| `/` | Hero (Dashboard) |
+| `/roadmap` | World Map |
 | `/quests` | Quest Log |
-| `/skills` | Skill Tree |
+| `/skills` | Talents |
 
 `GameShell` holds global HUD data (level, XP bar) via a shared dashboard query.
+
+---
+
+## Learning model (Campaign → Act → Quest)
+
+Duolingo/Codecademy progression, Diablo presentation. Domain vocabulary:
+
+| RPG term | Meaning today | Storage |
+|----------|---------------|---------|
+| **Campaign** | Course / story path (e.g. Systems Engineer Saga) | `domain/campaign.py` catalog (multi-campaign ready) |
+| **Tutorial** | Onboarding campaign (`tutorial`, stages 100–101) | Same catalog + seed rows |
+| **Act** | Chapter of 6 zones (stages) | Derived from `roadmap_stages.index` ranges |
+| **Quest** | Lesson step in a zone chain | `quests` table |
+| **Boss** | Project milestone (`quest_type = boss`) | Same `quests` row |
+| **Zone** | One roadmap stage | `roadmap_stages` |
+
+Quest chain per zone: `main → crafting → debug → test → boss`. Completion for now: set status `done` (UI: **Mark Cleared** / **Slay Boss**).
+
+```mermaid
+flowchart TB
+  Campaign["Campaign (catalog)"]
+  Act1["ACT I · stages 0–5"]
+  Act2["ACT II · stages 6–11"]
+  Act3["ACT III · stages 12–17"]
+  Zone["Zone / roadmap_stage"]
+  Quests["Quest chain (5 types)"]
+
+  Campaign --> Act1
+  Campaign --> Act2
+  Campaign --> Act3
+  Act1 --> Zone
+  Zone --> Quests
+```
+
+**API**
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/v1/campaigns/` | List campaigns with progress |
+| `GET /api/v1/campaigns/{slug}` | Campaign detail + act breakdown |
+| `GET /api/v1/dashboard/` | Includes `campaign` block for Hero screen |
+
+**Future (no schema change required yet):** add campaigns to DB, lesson `resources` links, multiple disciplines. Register new campaigns in `domain/campaign.py` until DB catalog exists.
 
 ---
 

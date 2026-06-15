@@ -3,10 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import type { SkillBranch } from "../../shared/api/types";
 
-const SkillTreeContext = createContext<{
-  state: { branches: SkillBranch[]; isLoading: boolean };
-  meta: { loading: boolean };
-} | null>(null);
+export interface SkillTreeState {
+  branches: SkillBranch[];
+  isLoading: boolean;
+}
+
+export interface SkillTreeActions {}
+
+export interface SkillTreeMeta {}
+
+interface SkillTreeContextValue {
+  state: SkillTreeState;
+  actions: SkillTreeActions;
+  meta: SkillTreeMeta;
+}
+
+const SkillTreeContext = createContext<SkillTreeContextValue | null>(null);
 
 export function SkillTreeProvider({ children }: { children: ReactNode }) {
   const { data, isLoading } = useQuery({
@@ -14,10 +26,11 @@ export function SkillTreeProvider({ children }: { children: ReactNode }) {
     queryFn: api.getSkillBranches,
   });
 
-  const value = useMemo(
+  const value = useMemo<SkillTreeContextValue>(
     () => ({
       state: { branches: data?.branches ?? [], isLoading },
-      meta: { loading: isLoading },
+      actions: {},
+      meta: {},
     }),
     [data?.branches, isLoading],
   );

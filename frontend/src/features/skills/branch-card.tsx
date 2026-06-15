@@ -5,15 +5,26 @@ import "./branch-card.css";
 
 const BRANCH_ICONS = ["⚔️", "🛡️", "🔧", "⚡", "📡", "🧪", "🏰"];
 
+function branchTier(progress: number): { label: string; className: string } {
+  if (progress >= 0.75) return { label: "Gold", className: "branch-card__tier--gold" };
+  if (progress >= 0.4) return { label: "Silver", className: "branch-card__tier--silver" };
+  return { label: "Bronze", className: "branch-card__tier--bronze" };
+}
+
 function Frame({ branch, index }: { branch: SkillBranch; index: number }) {
+  const tier = branchTier(branch.progress);
+
   return (
     <article className="branch-card">
       <div className="branch-card__sigil">{BRANCH_ICONS[index % BRANCH_ICONS.length]}</div>
-      <h3 className="branch-card__name">{branch.name}</h3>
+      <div className="branch-card__head">
+        <span className={`branch-card__tier stats ${tier.className}`}>{tier.label}</span>
+        <h3 className="branch-card__name">{branch.name}</h3>
+      </div>
       <p className="branch-card__meaning">{branch.meaning}</p>
       <div className="branch-card__domains">
         {branch.domains.map((d) => (
-          <DomainBadge key={d} name={d} color="#a78bfa" icon="✦" />
+          <DomainBadge key={d} name={d} color="#b39ad4" icon="✦" />
         ))}
       </div>
       <div className="branch-card__progress">

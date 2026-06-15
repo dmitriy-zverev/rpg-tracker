@@ -5,16 +5,17 @@
   z-index: 9999;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.08),
-    rgba(0, 0, 0, 0.08) 1px,
+    rgba(0, 0, 0, 0.06),
+    rgba(0, 0, 0, 0.06) 1px,
     transparent 1px,
-    transparent 3px
+    transparent 4px
   );
-  opacity: 0.35;
+  opacity: 0.1;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .crt-overlay {
     display: none;
+    animation: none;
   }
 }

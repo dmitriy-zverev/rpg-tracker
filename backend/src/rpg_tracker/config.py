@@ -13,6 +13,8 @@ class Settings(BaseSettings):
 
     database_url: Annotated[str, Field(default=f"sqlite:///{DEFAULT_DB}")]
     cors_origins: Annotated[list[str], Field(default=["http://localhost:5173"])]
+    pomodoro_focus_minutes: Annotated[int, Field(default=25, ge=1, le=120)]
+    pomodoro_break_minutes: Annotated[int, Field(default=5, ge=1, le=60)]
 
 
 settings = Settings()

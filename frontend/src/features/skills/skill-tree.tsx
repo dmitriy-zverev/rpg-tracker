@@ -1,35 +1,53 @@
+import { useEffect, useMemo, useState } from "react";
 import { SkillTreeProvider, useSkillTree } from "./skill-tree-provider";
-import { BranchCard } from "./branch-card";
-import { PixelPanel } from "../../shared/ui/pixel-panel/pixel-panel";
+import { SkillTreeCanvas } from "./skill-tree-canvas";
+import { SkillDetailPanel } from "./skill-detail-panel";
+import { SKILL_TREE_SLOTS } from "./skill-tree-layout";
+import { ScreenFrame } from "../../shared/ui/screen-frame/screen-frame";
+import { ScreenLoader } from "../../shared/ui/screen-loader/screen-loader";
 import "./skill-tree.css";
 
-function Grid() {
+function SkillScreen() {
   const { state } = useSkillTree();
-  if (state.isLoading) return <p>Loading skill tree...</p>;
+  const [selectedId, setSelectedId] = useState(1);
+
+  const slotByBranchId = useMemo(
+    () => new Map(SKILL_TREE_SLOTS.map((slot) => [slot.branchId, slot])),
+    [],
+  );
+
+  useEffect(() => {
+    const active = state.branches.find((branch) => branch.progress > 0 && branch.progress < 1);
+    if (active) setSelectedId(active.id);
+  }, [state.branches]);
+
+  if (state.isLoading) {
+    return <ScreenLoader label="Studying talents..." />;
+  }
+
+  const selectedBranch = state.branches.find((branch) => branch.id === selectedId) ?? state.branches[0];
+  if (!selectedBranch) return null;
+
+  const selectedSlot = slotByBranchId.get(selectedBranch.id);
 
   return (
-    <div className="skill-grid">
-      {state.branches.map((branch, i) => (
-        <div key={branch.id} className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-          <BranchCard.Frame branch={branch} index={i} />
-        </div>
-      ))}
-    </div>
+    <ScreenFrame title="Skill Tree" subtitle={selectedBranch.name}>
+      <div className="skill-screen">
+        <SkillTreeCanvas
+          branches={state.branches}
+          selectedId={selectedBranch.id}
+          onSelect={setSelectedId}
+        />
+        <SkillDetailPanel branch={selectedBranch} icon={selectedSlot?.icon ?? "✦"} />
+      </div>
+    </ScreenFrame>
   );
 }
 
 export function SkillTreePage() {
   return (
     <SkillTreeProvider>
-      <PixelPanel.Frame>
-        <PixelPanel.Header>Skill Constellation</PixelPanel.Header>
-        <PixelPanel.Body>
-          <div className="skill-tree">
-            <p className="skill-tree__intro">Seven branches — progress unlocks the next tier of craft.</p>
-            <Grid />
-          </div>
-        </PixelPanel.Body>
-      </PixelPanel.Frame>
+      <SkillScreen />
     </SkillTreeProvider>
   );
 }

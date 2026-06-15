@@ -229,3 +229,7 @@ node_modules/
 dist/
 .api-port
 *.xlsx
+
+report.html
+current.png
+.lazyweb

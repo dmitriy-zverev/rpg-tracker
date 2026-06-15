@@ -1,4 +1,13 @@
-import type { Dashboard, Domain, Quest, QuestStatus, RoadmapStage, SkillBranch } from "./types";
+import type {
+  CampaignDetail,
+  CampaignSummary,
+  Dashboard,
+  Domain,
+  Quest,
+  QuestStatus,
+  RoadmapStage,
+  SkillBranch,
+} from "./types";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
@@ -8,7 +17,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!response.ok) {
-    throw new Error(`API ${response.status}: ${path}`);
+    let detail = `API ${response.status}: ${path}`;
+    try {
+      const body = (await response.json()) as { detail?: string };
+      if (body.detail) detail = body.detail;
+    } catch {
+      // keep default message
+    }
+    throw new Error(detail);
   }
   return response.json() as Promise<T>;
 }
@@ -28,4 +44,7 @@ export const api = {
     request<Quest>(`/api/v1/quests/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
   getRoadmapStages: () => request<{ stages: RoadmapStage[] }>("/api/v1/roadmap/stages"),
   getSkillBranches: () => request<{ branches: SkillBranch[] }>("/api/v1/skills/branches"),
+  getPomodoroConfig: () => request<{ focus_seconds: number; break_seconds: number }>("/api/v1/pomodoro/config"),
+  getCampaigns: () => request<{ campaigns: CampaignSummary[] }>("/api/v1/campaigns/"),
+  getCampaign: (slug: string) => request<CampaignDetail>(`/api/v1/campaigns/${slug}`),
 };

@@ -1,8 +1,13 @@
 import { DashboardProvider, useDashboard } from "./dashboard-provider";
-import { PixelPanel } from "../../shared/ui/pixel-panel/pixel-panel";
-import { HudStat } from "../../shared/ui/hud-stat/hud-stat";
+import { QuestFocusPanel } from "../quests/quest-focus-panel";
+import { CampaignOverview } from "../campaign/campaign-overview";
+import { ScreenFrame } from "../../shared/ui/screen-frame/screen-frame";
+import { ScreenLoader } from "../../shared/ui/screen-loader/screen-loader";
+import { usePager } from "../../shared/hooks/use-pager";
 import { RoadmapBar } from "../../shared/ui/pixel-progress/pixel-progress";
 import { DomainBadge } from "../../shared/ui/domain-badge/domain-badge";
+import type { CampaignDetail, Dashboard } from "../../shared/api/types";
+import { buildAchievements } from "./achievements";
 import "./dashboard.css";
 
 const RANKS = [
@@ -15,156 +20,209 @@ const RANKS = [
   { min: 19, title: "Systems Architect" },
 ];
 
-function PlayerHud() {
-  const { state } = useDashboard();
-  const d = state.data;
-  if (!d) return null;
-  const xpPct = ((d.total_xp % 350) / 350) * 100;
+const SLIDES = ["Overview", "Campaign", "Achievements"] as const;
 
-  return (
-    <div className="player-hud">
-      <div className="player-hud__hero">
-        <span className="player-hud__avatar">🧙</span>
-        <div>
-          <h1>{d.player.name}</h1>
-          <p className="player-hud__title">{d.player.title}</p>
-          <p className="stats">
-            LV {d.level} · {d.rank}
-          </p>
-        </div>
-      </div>
-      <div className="player-hud__xp">
-        <span className="stats">{d.total_xp} XP · {d.xp_to_next_level} to next</span>
-        <RoadmapBar progress={xpPct / 100} />
-      </div>
-      <RankLadder currentLevel={d.level} />
-    </div>
-  );
+function nextBossLabel(campaign: CampaignDetail, level: number): string {
+  const pendingAct = campaign.acts.find((act) => act.status === "active" && act.boss_done < act.boss_total);
+  if (pendingAct) return `Act ${pendingAct.number}`;
+
+  const nextRank = RANKS.find((rank) => rank.min > level);
+  if (nextRank) return `Lv ${nextRank.min}`;
+
+  return "Cleared";
 }
 
-function RankLadder({ currentLevel }: { currentLevel: number }) {
-  return (
-    <div className="rank-ladder">
-      {RANKS.map((r) => (
-        <div
-          key={r.min}
-          className={`rank-ladder__step${currentLevel >= r.min ? " rank-ladder__step--lit" : ""}`}
-        >
-          <span className="stats">{r.min}</span>
-          <span>{r.title}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
+function OverviewDomainPulse({ domains }: { domains: Dashboard["domains"] }) {
+  const topDomains = [...domains].sort((a, b) => b.progress - a.progress).slice(0, 4);
+  if (topDomains.length === 0) return null;
 
-function QuestStatsGrid() {
-  const { state } = useDashboard();
-  const counts = state.data?.quest_counts;
-  if (!counts) return null;
   return (
-    <div className="quest-stats-grid">
-      {Object.entries(counts).map(([key, val]) => (
-        <HudStat.Tile key={key}>
-          <HudStat.Label>{key.replace("_", " ")}</HudStat.Label>
-          <HudStat.Value>{val}</HudStat.Value>
-        </HudStat.Tile>
-      ))}
-    </div>
-  );
-}
-
-function DomainXpTable() {
-  const { state } = useDashboard();
-  const domains = state.data?.domains;
-  if (!domains) return null;
-  return (
-    <table className="domain-table">
-      <thead>
-        <tr>
-          <th>Domain</th>
-          <th>XP</th>
-          <th>Progress</th>
-        </tr>
-      </thead>
-      <tbody>
-        {domains.map((d) => (
-          <tr key={d.slug}>
-            <td>
-              <DomainBadge name={d.name} color={d.color} icon={d.icon} />
-            </td>
-            <td className="stats">
-              {d.earned_xp}/{d.available_xp}
-            </td>
-            <td>
-              <RoadmapBar progress={d.progress} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function StageProgressChart() {
-  const { state } = useDashboard();
-  const stages = state.data?.stages;
-  if (!stages) return null;
-  return (
-    <div className="stage-chart">
-      {stages.map((s) => (
-        <div key={s.index} className="stage-chart__row">
-          <span className="stage-chart__label">
-            M{s.month} {s.name}
+    <div className="dash-domain-pulse" aria-label="Domain progress">
+      {topDomains.map((domain) => (
+        <article key={domain.slug} className="dash-domain-pulse__cell">
+          <DomainBadge name={domain.name} color={domain.color} icon={domain.icon} />
+          <RoadmapBar progress={domain.progress} />
+          <span className="dash-domain-pulse__meta stats">
+            {domain.earned_xp}/{domain.available_xp} XP
           </span>
-          <div className="stage-chart__bar-wrap">
-            <div className="stage-chart__bar" style={{ width: `${s.progress * 100}%` }} />
-          </div>
-          <span className="stats">{(s.progress * 100).toFixed(0)}%</span>
-        </div>
+        </article>
       ))}
     </div>
   );
 }
 
-function Frame({ children }: { children: React.ReactNode }) {
-  return <div className="dashboard">{children}</div>;
-}
-
-export const Dashboard = { Frame, PlayerHud, QuestStatsGrid, DomainXpTable, StageProgressChart };
-
-export function DashboardPage() {
+function OverviewMotivationChips() {
   const { state } = useDashboard();
-  if (state.isLoading) return <p>Loading war room...</p>;
+  const dashboard = state.data;
+  if (!dashboard) return null;
+
+  const counts = dashboard.quest_counts;
+  const activeCount = counts.in_progress ?? 0;
+  const clearedCount = counts.done ?? 0;
+  const nextBoss = nextBossLabel(dashboard.campaign, dashboard.level);
 
   return (
-    <Dashboard.Frame>
-      <Dashboard.PlayerHud />
-      <section className="dashboard__section">
-        <h2>Quest Status</h2>
-        <Dashboard.QuestStatsGrid />
+    <div className="dash-motivation-chips" aria-label="Quest momentum">
+      <div className="dash-motivation-chip dash-motivation-chip--active">
+        <span className="dash-motivation-chip__value stats">{activeCount}</span>
+        <span className="dash-motivation-chip__label">Active</span>
+      </div>
+      <div className="dash-motivation-chip dash-motivation-chip--cleared">
+        <span className="dash-motivation-chip__value stats">{clearedCount}</span>
+        <span className="dash-motivation-chip__label">Cleared</span>
+      </div>
+      <div className="dash-motivation-chip dash-motivation-chip--boss">
+        <span className="dash-motivation-chip__value stats">{nextBoss}</span>
+        <span className="dash-motivation-chip__label">Next boss</span>
+      </div>
+    </div>
+  );
+}
+
+function OverviewSlide() {
+  const { state } = useDashboard();
+  const dashboard = state.data;
+  if (!dashboard) return null;
+
+  const campaign = dashboard.campaign;
+  const hasJourneyLink = Boolean(dashboard.current_quest ?? dashboard.suggested_quest);
+
+  return (
+    <div className="dash-slide dash-slide--overview">
+      <header className="dash-campaign-strip">
+        <h2 className="dash-campaign-strip__name display">{campaign.name}</h2>
+        <div className="dash-campaign-strip__track">
+          <RoadmapBar progress={campaign.progress} />
+        </div>
+        <span className="dash-campaign-strip__xp stats">
+          {campaign.earned_xp}/{campaign.available_xp} XP · {(campaign.progress * 100).toFixed(0)}%
+        </span>
+      </header>
+      <div className={`dash-overview-grid${hasJourneyLink ? " dash-overview-grid--linked" : ""}`}>
+        <QuestFocusPanel linked={hasJourneyLink} />
+        <aside className={`dash-journey${hasJourneyLink ? " dash-journey--linked" : ""}`} aria-label="Rank and momentum">
+          <header className="dash-journey__head">
+            <h3 className="dash-journey__title display">Rank</h3>
+            <span className="dash-journey__rank stats">
+              Lv {dashboard.level} · {dashboard.rank}
+            </span>
+          </header>
+          <div className="dash-tier-track">
+            {RANKS.map((rank, index) => {
+              const isLit = dashboard.level >= rank.min;
+              const isCurrent =
+                isLit && (RANKS[index + 1] ? dashboard.level < RANKS[index + 1].min : true);
+              return (
+                <div
+                  key={rank.min}
+                  className={`dash-tier${isLit ? " dash-tier--lit" : ""}${isCurrent ? " dash-tier--current" : ""}${isCurrent && hasJourneyLink ? " dash-tier--path" : ""}`}
+                >
+                  <span className="dash-tier__lv stats">{rank.min}</span>
+                  <span className="dash-tier__name">{rank.title}</span>
+                </div>
+              );
+            })}
+          </div>
+          <OverviewDomainPulse domains={dashboard.domains} />
+          <OverviewMotivationChips />
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function AchievementsSlide() {
+  const { state } = useDashboard();
+  const dashboard = state.data;
+  if (!dashboard) return null;
+
+  const achievements = buildAchievements(dashboard);
+  const earnedCount = achievements.filter((item) => item.earned).length;
+
+  return (
+    <div className="dash-slide dash-slide--progress">
+      <section className="dash-progress-section dash-progress-section--achievements" aria-labelledby="dash-achievements-title">
+        <header className="dash-progress-section__head">
+          <h3 id="dash-achievements-title" className="dash-progress-section__title display">
+            Achievements
+          </h3>
+          <span className="dash-progress-section__meta">
+            {earnedCount}/{achievements.length} earned
+          </span>
+        </header>
+        <div className="dash-achievements-grid">
+          {achievements.map((achievement) => (
+            <article
+              key={achievement.id}
+              className={`dash-achievement-card${achievement.earned ? " dash-achievement-card--earned" : ""}`}
+            >
+              <span className="dash-achievement-card__icon" aria-hidden>
+                {achievement.icon}
+              </span>
+              <div className="dash-achievement-card__body">
+                <h4 className="dash-achievement-card__title display">{achievement.title}</h4>
+                <p className="dash-achievement-card__detail">{achievement.detail}</p>
+              </div>
+              {achievement.progressLabel && (
+                <span className="dash-achievement-card__progress">{achievement.progressLabel}</span>
+              )}
+            </article>
+          ))}
+        </div>
       </section>
-      <section className="dashboard__section">
-        <h2>Domain XP</h2>
-        <Dashboard.DomainXpTable />
+
+      <section className="dash-progress-section dash-progress-section--domains" aria-labelledby="dash-domains-title">
+        <header className="dash-progress-section__head">
+          <h3 id="dash-domains-title" className="dash-progress-section__title display">
+            Domains
+          </h3>
+          <span className="dash-progress-section__meta">{dashboard.domains.length} tracks</span>
+        </header>
+        <div className="dash-domains-grid">
+          {dashboard.domains.map((domain) => (
+            <div key={domain.slug} className="dash-domain-card">
+              <DomainBadge name={domain.name} color={domain.color} icon={domain.icon} />
+              <span className="dash-domain-card__xp">
+                {domain.earned_xp}/{domain.available_xp}
+              </span>
+              <RoadmapBar progress={domain.progress} />
+            </div>
+          ))}
+        </div>
       </section>
-      <section className="dashboard__section">
-        <h2>Stage Progress</h2>
-        <Dashboard.StageProgressChart />
-      </section>
-    </Dashboard.Frame>
+    </div>
+  );
+}
+
+function DashboardScreen() {
+  const { state } = useDashboard();
+  const pager = usePager(SLIDES.length, 0);
+
+  if (state.isLoading) {
+    return <ScreenLoader label="Reading grimoire..." />;
+  }
+
+  return (
+    <ScreenFrame title={SLIDES[pager.page]}>
+      <ScreenFrame.Pager
+        page={pager.page}
+        total={SLIDES.length}
+        onPrev={pager.prev}
+        onNext={pager.next}
+        canPrev={pager.canPrev}
+        canNext={pager.canNext}
+      />
+      {pager.page === 0 && <OverviewSlide />}
+      {pager.page === 1 && <CampaignOverview />}
+      {pager.page === 2 && <AchievementsSlide />}
+    </ScreenFrame>
   );
 }
 
 export function DashboardPageRoot() {
   return (
     <DashboardProvider>
-      <PixelPanel.Frame>
-        <PixelPanel.Header>War Room</PixelPanel.Header>
-        <PixelPanel.Body>
-          <DashboardPage />
-        </PixelPanel.Body>
-      </PixelPanel.Frame>
+      <DashboardScreen />
     </DashboardProvider>
   );
 }

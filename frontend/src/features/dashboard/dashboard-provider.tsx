@@ -1,25 +1,59 @@
-import { createContext, use, useMemo, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { createContext, use, useMemo, useState, type ReactNode } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePlayerSession } from "../../app/game-shell/player-session-provider";
 import { api } from "../../shared/api/client";
 import type { Dashboard } from "../../shared/api/types";
 
-const DashboardContext = createContext<{
-  state: { data: Dashboard | undefined; isLoading: boolean };
-  meta: { loading: boolean };
-} | null>(null);
+export interface DashboardState {
+  data: Dashboard | undefined;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface DashboardActions {
+  startQuest: (id: number) => void;
+}
+
+export interface DashboardMeta {
+  isStarting: boolean;
+}
+
+interface DashboardContextValue {
+  state: DashboardState;
+  actions: DashboardActions;
+  meta: DashboardMeta;
+}
+
+const DashboardContext = createContext<DashboardContextValue | null>(null);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: api.getDashboard,
+  const playerSession = usePlayerSession();
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const startMutation = useMutation({
+    mutationFn: (id: number) => api.updateQuest(id, { status: "in_progress" }),
+    onMutate: () => setError(null),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: playerSession.meta.queryKey });
+      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      queryClient.invalidateQueries({ queryKey: ["roadmap"] });
+      queryClient.invalidateQueries({ queryKey: ["skills"] });
+    },
+    onError: (err: Error) => setError(err.message),
   });
 
-  const value = useMemo(
+  const value = useMemo<DashboardContextValue>(
     () => ({
-      state: { data, isLoading },
-      meta: { loading: isLoading },
+      state: {
+        data: playerSession.state.data,
+        isLoading: playerSession.state.isLoading,
+        error,
+      },
+      actions: { startQuest: (id: number) => startMutation.mutate(id) },
+      meta: { isStarting: startMutation.isPending },
     }),
-    [data, isLoading],
+    [playerSession.state.data, playerSession.state.isLoading, error, startMutation],
   );
 
   return <DashboardContext value={value}>{children}</DashboardContext>;

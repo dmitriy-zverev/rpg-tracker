@@ -1,0 +1,41 @@
+.game-ambient {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.game-ambient__speck {
+  position: absolute;
+  bottom: -8px;
+  background: var(--gold);
+  opacity: 0;
+  box-shadow: 0 0 6px rgba(248, 193, 74, 0.45);
+  animation-name: speck-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes speck-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.35;
+  }
+  90% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: translateY(-105vh) translateX(12px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-ambient {
+    display: none;
+  }
+}

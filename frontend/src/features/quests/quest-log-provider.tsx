@@ -3,82 +3,76 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import type { Quest, QuestStatus } from "../../shared/api/types";
 
-export interface QuestLogFilters {
-  stage_id?: number;
-  domain?: string;
-  status?: QuestStatus;
-}
-
-interface QuestLogState {
-  filters: QuestLogFilters;
+export interface QuestLogState {
   quests: Quest[];
   isLoading: boolean;
-  expandedId: number | null;
+  selectedQuestId: number | null;
+  error: string | null;
 }
 
-interface QuestLogActions {
-  setFilter: (key: keyof QuestLogFilters, value: string | number | undefined) => void;
+export interface QuestLogActions {
+  selectQuest: (id: number) => void;
+  clearSelection: () => void;
   updateStatus: (id: number, status: QuestStatus) => void;
   updateNotes: (id: number, notes: string, evidence: string) => void;
-  toggleExpand: (id: number) => void;
 }
 
-interface QuestLogMeta {
+export interface QuestLogMeta {
   isPending: boolean;
 }
 
-const QuestLogContext = createContext<{
+interface QuestLogContextValue {
   state: QuestLogState;
   actions: QuestLogActions;
   meta: QuestLogMeta;
-} | null>(null);
+}
+
+const QuestLogContext = createContext<QuestLogContextValue | null>(null);
 
 export function QuestLogProvider({ children }: { children: ReactNode }) {
-  const [filters, setFilters] = useState<QuestLogFilters>({});
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [selectedQuestId, setSelectedQuestId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["quests", filters],
-    queryFn: () => api.getQuests(filters),
+    queryKey: ["quests"],
+    queryFn: () => api.getQuests(),
   });
 
   const mutation = useMutation({
     mutationFn: ({ id, body }: { id: number; body: Parameters<typeof api.updateQuest>[1] }) =>
       api.updateQuest(id, body),
+    onMutate: () => setError(null),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quests"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["roadmap"] });
       queryClient.invalidateQueries({ queryKey: ["skills"] });
     },
+    onError: (err: Error) => setError(err.message),
   });
 
-  const value = useMemo(
+  const value = useMemo<QuestLogContextValue>(
     () => ({
       state: {
-        filters,
         quests: data?.quests ?? [],
         isLoading,
-        expandedId,
+        selectedQuestId,
+        error,
       },
       actions: {
-        setFilter: (key: keyof QuestLogFilters, value: string | number | undefined) => {
-          setFilters((prev) => ({ ...prev, [key]: value === "" ? undefined : value }));
-        },
+        selectQuest: (id: number) => setSelectedQuestId(id),
+        clearSelection: () => setSelectedQuestId(null),
         updateStatus: (id: number, status: QuestStatus) => {
           mutation.mutate({ id, body: { status } });
         },
         updateNotes: (id: number, notes: string, evidence: string) => {
           mutation.mutate({ id, body: { notes, evidence } });
         },
-        toggleExpand: (id: number) => {
-          setExpandedId((cur) => (cur === id ? null : id));
-        },
       },
       meta: { isPending: mutation.isPending },
     }),
-    [filters, data?.quests, isLoading, expandedId, mutation],
+    [data?.quests, isLoading, selectedQuestId, error, mutation],
   );
 
   return <QuestLogContext value={value}>{children}</QuestLogContext>;
