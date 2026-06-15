@@ -1,0 +1,18 @@
+:root {
+  --bg-void: #0b0913;
+  --bg-deep: #14111f;
+  --bg-panel: #211a35;
+  --bg-panel-raised: #2d2545;
+  --gold: #f8c14a;
+  --gold-dim: #b8922e;
+  --text: #f8fafc;
+  --muted: #c7bfe6;
+  --xp-fill: #34d399;
+  --xp-glow: rgba(52, 211, 153, 0.35);
+  --skill-fill: #a78bfa;
+  --danger: #f87171;
+  --party-width: 220px;
+  --font-display: "Press Start 2P", monospace;
+  --font-body: "VT323", monospace;
+  --font-stats: "Silkscreen", monospace;
+}

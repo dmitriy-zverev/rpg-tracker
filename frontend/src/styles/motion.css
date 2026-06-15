@@ -1,0 +1,37 @@
+@keyframes page-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes xp-fill {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes level-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px var(--xp-glow));
+  }
+}
+
+.stagger-item {
+  animation: page-stagger 0.4s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-item {
+    animation: none;
+  }
+}

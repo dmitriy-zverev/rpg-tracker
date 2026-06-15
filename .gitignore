@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# GitHub Actions
+.github/workflows/
+
+AGENTS.md
+CLAUDE.md
+
+# RPG Tracker
+backend/data/
+node_modules/
+dist/
+.api-port
+*.xlsx

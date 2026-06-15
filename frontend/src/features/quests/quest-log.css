@@ -1,0 +1,65 @@
+.quest-log {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quest-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quest-toolbar select,
+.quest-toolbar input,
+.quest-row__status,
+.quest-row__details textarea {
+  background: var(--bg-void);
+  border: 2px solid var(--gold-dim);
+  color: var(--text);
+  padding: 8px;
+}
+
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quest-row {
+  background: var(--bg-panel-raised);
+  border-left: 4px solid var(--gold-dim);
+  padding: 10px;
+}
+
+.quest-row--open {
+  border-left-color: var(--gold);
+}
+
+.quest-row__main {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.quest-row__title {
+  font-size: 20px;
+}
+
+.quest-row__details {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-panel);
+  border-top: 2px solid var(--gold-dim);
+}
+
+.quest-row__details label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+}

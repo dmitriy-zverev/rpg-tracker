@@ -1,0 +1,30 @@
+.hud-stat {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold-dim);
+  min-width: 72px;
+  min-height: 72px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-stat__label {
+  font-size: 7px;
+  text-align: center;
+}
+
+.hud-stat__value {
+  color: var(--gold);
+}
+
+.domain-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-left: 4px solid;
+  font-size: 20px;
+}

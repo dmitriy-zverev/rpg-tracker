@@ -1,0 +1,29 @@
+@import "./tokens.css";
+@import "./typography.css";
+@import "./atmosphere.css";
+@import "./crt.css";
+@import "./motion.css";
+@import "./pixel.css";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

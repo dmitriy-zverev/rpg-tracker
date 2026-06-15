@@ -1,0 +1,16 @@
+.skill-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-tree__intro {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}

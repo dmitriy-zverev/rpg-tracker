@@ -1,0 +1,103 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.dashboard__section h2 {
+  margin-bottom: 12px;
+}
+
+.player-hud {
+  display: grid;
+  gap: 16px;
+}
+
+.player-hud__hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.player-hud__avatar {
+  font-size: 56px;
+}
+
+.player-hud__title {
+  color: var(--muted);
+}
+
+.quest-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rank-ladder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rank-ladder__step {
+  padding: 6px 10px;
+  border: 2px solid var(--gold-dim);
+  color: var(--muted);
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rank-ladder__step--lit {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--bg-panel-raised);
+}
+
+.domain-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.domain-table th,
+.domain-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--bg-panel-raised);
+  text-align: left;
+}
+
+.stage-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stage-chart__row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.stage-chart__bar-wrap {
+  height: 14px;
+  background: var(--bg-void);
+  border: 2px solid var(--gold-dim);
+}
+
+.stage-chart__bar {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--xp-fill) 0,
+    var(--xp-fill) 8px,
+    transparent 8px,
+    transparent 10px
+  );
+}
+
+.stage-chart__label {
+  font-size: 18px;
+  color: var(--muted);
+}

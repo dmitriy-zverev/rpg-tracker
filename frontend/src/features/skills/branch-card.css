@@ -1,0 +1,55 @@
+.branch-card {
+  background: var(--bg-panel-raised);
+  border: 2px solid var(--gold-dim);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: inset 0 0 0 2px var(--bg-panel);
+}
+
+.branch-card__sigil {
+  font-size: 36px;
+}
+
+.branch-card__name {
+  font-size: 22px;
+  color: var(--gold);
+}
+
+.branch-card__meaning {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.branch-card__domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.branch-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.branch-card__unlock {
+  padding: 10px;
+  background: var(--bg-panel);
+  border-left: 3px solid var(--skill-fill);
+}
+
+.branch-card__unlock-label {
+  display: block;
+  color: var(--skill-fill);
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.branch-card__anti-ai {
+  font-size: 16px;
+  color: var(--muted);
+  font-style: italic;
+}

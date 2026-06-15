@@ -1,0 +1,18 @@
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.roadmap__intro {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.roadmap-trail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 24px;
+  border-left: 4px dashed var(--gold-dim);
+}

@@ -1,0 +1,67 @@
+.level-up-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.level-up-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 9, 19, 0.85);
+}
+
+.level-up-modal__card {
+  position: relative;
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: level-up-pop 0.5s ease-out;
+}
+
+.level-up-modal__burst {
+  font-size: 48px;
+  animation: level-up-pulse 1s ease-in-out infinite;
+}
+
+.level-up-modal__level {
+  font-size: 32px;
+  color: var(--gold);
+}
+
+.level-up-modal__rank {
+  color: var(--muted);
+  font-size: 20px;
+}
+
+@keyframes level-up-pop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes level-up-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .level-up-modal__card,
+  .level-up-modal__burst {
+    animation: none;
+  }
+}
